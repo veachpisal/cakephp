@@ -259,9 +259,6 @@ class SessionTest extends TestCase
         $value = $session->consume('');
         $this->assertNull($value);
 
-        $value = $session->consume(null);
-        $this->assertNull($value);
-
         $value = $session->consume('Some.array');
         $expected = ['key1' => 'value1', 'key2' => 'value2'];
         $this->assertEquals($expected, $value);
@@ -335,11 +332,15 @@ class SessionTest extends TestCase
     {
         $session = new Session();
         $session->write('Delete.me', 'Clearing out');
+
         $session->delete('Delete.me');
         $this->assertFalse($session->check('Delete.me'));
         $this->assertTrue($session->check('Delete'));
 
         $session->write('Clearing.sale', 'everything must go');
+        $session->delete('');
+        $this->assertTrue($session->check('Clearing.sale'));
+
         $session->delete('Clearing');
         $this->assertFalse($session->check('Clearing.sale'));
         $this->assertFalse($session->check('Clearing'));
