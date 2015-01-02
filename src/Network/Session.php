@@ -396,14 +396,19 @@ class Session
     }
 
     /**
-     * Reads and deletes a variable from session.
+     * Reads and deletes a variable from session, or all of them, if no parameters given.
      *
-     * @param string $name The key to read and remove (or a path as sent to Hash.extract).
+     * @param string|null $name The key to read and remove (or a path as sent to Hash.extract).
      * @return mixed The value of the session variable, null if session not available,
      *   session not started, or provided name not found in the session.
      */
-    public function consume($name)
+    public function consume($name = null)
     {
+        if ($name === null) {
+            $session = $_SESSION;
+            $_SESSION = array();
+            return $session;
+        }
         if (empty($name)) {
             return null;
         }
@@ -468,13 +473,17 @@ class Session
     }
 
     /**
-     * Removes a variable from session.
+     * Removes a variable from session, or all of them, if no parameters given.
      *
-     * @param string $name Session variable to remove
-     * @return bool Success
+     * @param string|null $name Session variable to remove. Null empties the session completely.
+     * @return void
      */
-    public function delete($name)
+    public function delete($name = null)
     {
+        if ($name === null) {
+            $_SESSION = array();
+            return;
+        }
         if ($this->check($name)) {
             $this->_overwrite($_SESSION, Hash::remove($_SESSION, $name));
         }

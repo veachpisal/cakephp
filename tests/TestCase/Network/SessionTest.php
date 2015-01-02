@@ -269,6 +269,31 @@ class SessionTest extends TestCase
     }
 
     /**
+     * Test consuming complete session data.
+     *
+     * @return void
+     */
+    public function testConsumeAll()
+    {
+        $session = new Session();
+        $session->write('Some.string', 'value');
+        $session->write('Some.array', ['key1' => 'value1', 'key2' => 'value2']);
+
+        $value = $session->consume();
+        $expected = [
+            'Some' => [
+                'array' => [
+                    'key1' => 'value1',
+                    'key2' => 'value2'
+                ],
+                'string' => 'value'
+            ]
+        ];
+        $this->assertEquals($expected, $value);
+        $this->assertSame([], $session->read());
+    }
+
+    /**
      * testId method
      *
      * @return void
@@ -318,6 +343,21 @@ class SessionTest extends TestCase
         $session->delete('Clearing');
         $this->assertFalse($session->check('Clearing.sale'));
         $this->assertFalse($session->check('Clearing'));
+    }
+
+    /**
+     * Test deleting complete session data.
+     *
+     * @return void
+     */
+    public function testDeleteAll()
+    {
+        $session = new Session();
+        $session->write('Some.string', 'value');
+        $session->write('Some.array', ['key1' => 'value1', 'key2' => 'value2']);
+
+        $session->delete();
+        $this->assertSame([], $session->read());
     }
 
     /**
